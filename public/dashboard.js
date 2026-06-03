@@ -102,25 +102,33 @@ async function loadLogs() {
         log.file_path,
       ].some((value) => value && value.toString().toLowerCase().includes(search));
     });
-    logsBody.innerHTML = logs
-      .map((log) => {
-        let details = '';
-        try {
-          details = formatDetails(log.details_json);
-        } catch (e) {}
-        return `<tr>
-          <td style="white-space:nowrap;font-size:0.78rem;color:var(--text-muted)">${formatDate(log.created_at)}</td>
-          <td>${levelBadge(log.level)}</td>
-          <td>${moduleTag(log.module)}</td>
-          <td><span class="event-cell">${escapeHtml(log.event)}</span></td>
-          <td style="max-width:200px">${escapeHtml(log.message)}</td>
-          <td class="details-cell">${details}</td>
-          <td style="font-size:0.78rem">${escapeHtml(log.device_model || '')}</td>
-          <td style="font-size:0.78rem;text-align:center">${escapeHtml(log.android_version || '')}</td>
-          <td style="text-align:center;font-weight:600;font-size:0.8rem">${log.battery_level ?? ''}<span style="color:var(--text-muted);font-weight:400">${log.battery_level != null ? '%' : ''}</span></td>
-        </tr>`;
-      })
-      .join('');
+    let html = '';
+    let lastDate = '';
+    logs.forEach((log) => {
+      const d = new Date(log.created_at);
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      if (dateKey !== lastDate) {
+        lastDate = dateKey;
+        const displayDate = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+        html += `<tr class="day-header"><td colspan="9">${displayDate}</td></tr>`;
+      }
+      let details = '';
+      try {
+        details = formatDetails(log.details_json);
+      } catch (e) {}
+      html += `<tr>
+        <td style="white-space:nowrap;font-size:0.78rem;color:var(--text-muted)">${formatDate(log.created_at)}</td>
+        <td>${levelBadge(log.level)}</td>
+        <td>${moduleTag(log.module)}</td>
+        <td><span class="event-cell">${escapeHtml(log.event)}</span></td>
+        <td style="max-width:200px">${escapeHtml(log.message)}</td>
+        <td class="details-cell">${details}</td>
+        <td style="font-size:0.78rem">${escapeHtml(log.device_model || '')}</td>
+        <td style="font-size:0.78rem;text-align:center">${escapeHtml(log.android_version || '')}</td>
+        <td style="text-align:center;font-weight:600;font-size:0.8rem">${log.battery_level ?? ''}<span style="color:var(--text-muted);font-weight:400">${log.battery_level != null ? '%' : ''}</span></td>
+      </tr>`;
+    });
+    logsBody.innerHTML = html;
     if (logCount) {
       logCount.textContent = logs.length + ' registros';
     }

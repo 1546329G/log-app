@@ -307,6 +307,21 @@ tr:hover td {
   background: rgba(59, 130, 246, 0.03);
 }
 
+.day-header td {
+  background: var(--bg-secondary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.day-header:hover td {
+  background: var(--bg-secondary);
+}
+
 .level-badge {
   display: inline-block;
   padding: 2px 10px;
