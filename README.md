@@ -58,86 +58,140 @@ npm start
 
 ## Uso desde Android con Retrofit
 
+Este repositorio incluye un helper Android de telemetría basado en Retrofit y compatible con la API de logs de `https://log-app.gandywilliam.dev`.
+
+### Dependencias necesarias
+
+Agrega estas dependencias a tu `build.gradle` de módulo:
+
+```gradle
+implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+```
+
+### Clases Android disponibles
+
+Los archivos de ayuda se encuentran en `android/com/photobackup/telemetry/`:
+
+- `TelemetryLogger.java`
+- `TelemetryApi.java`
+- `TelemetryLogRequest.java`
+- `TelemetryResponse.java`
+- `TelemetryConstants.java`
+
+### Inicialización
+
+Inicializa el singleton en tu `Application` o en el primer punto de entrada:
+
 ```java
-public interface TelemetryApi {
-    @POST("/api/logs")
-    Call<ApiResponse> sendLog(@Body LogRequest payload);
-
-    @GET("/api/logs")
-    Call<LogsResponse> listLogs(@Query("level") String level,
-                                @Query("module") String module,
-                                @Query("event") String event,
-                                @Query("fecha_inicio") String fechaInicio,
-                                @Query("fecha_fin") String fechaFin,
-                                @Query("page") int page,
-                                @Query("limit") int limit);
-
-    @GET("/api/stats")
-    Call<StatsResponse> getStats();
+public class App extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        TelemetryLogger.init(this);
+    }
 }
 ```
 
-Modelo de petición `LogRequest`:
+### Uso básico
 
 ```java
-public class LogRequest {
-    public String level;
-    public String module;
-    public String event;
-    public String message;
-    public Map<String, Object> details_json;
-    public String device_model;
-    public String android_version;
-    public String app_version;
-    public Integer battery_level;
-    public String screen_state;
-    public String service_state;
-    public String photo_uri;
-    public String file_path;
-    public Integer execution_time_ms;
+TelemetryLogger.getInstance().logInfo(
+    TelemetryConstants.Module.BACKUP_SERVICE,
+    TelemetryConstants.Event.SERVICE_STARTED,
+    "Servicio BackupService iniciado correctamente"
+);
+```
+
+### Manejo de excepciones
+
+En todos los `catch (Exception e)` del flujo crítico debes registrar el error:
+
+```java
+try {
+    // operación crítica
+} catch (Exception e) {
+    TelemetryLogger.getInstance().logError(
+        TelemetryConstants.Module.BACKUP_SERVICE,
+        TelemetryConstants.Event.UNKNOWN_ERROR,
+        "Error en BackupService",
+        e
+    );
 }
 ```
 
-Ejemplo de consumo básico:
+### Eventos recomendados
+
+BackupService:
+- `SERVICE_CREATED`
+- `SERVICE_STARTED`
+- `SERVICE_DESTROYED`
+- `SERVICE_RESTARTED`
+- `SERVICE_TASK_REMOVED`
+
+PhotoObserver:
+- `PHOTO_OBSERVER_STARTED`
+- `PHOTO_OBSERVER_TRIGGERED`
+
+CameraFileObserver:
+- `FILE_OBSERVER_STARTED`
+- `FILE_OBSERVER_TRIGGERED`
+
+PhotoQueueManager:
+- `QUEUE_ADD`
+- `QUEUE_PROCESS_START`
+- `QUEUE_PROCESS_SUCCESS`
+- `QUEUE_PROCESS_FAILED`
+
+FileCopier:
+- `PHOTO_COPY_START`
+- `PHOTO_COPY_SUCCESS`
+- `PHOTO_COPY_FAILED`
+
+Android:
+- `SCREEN_ON`
+- `SCREEN_OFF`
+- `USER_PRESENT`
+- `DEVICE_LOCKED`
+
+Errores:
+- `IS_PENDING`
+- `SECURITY_EXCEPTION`
+- `FILE_NOT_FOUND`
+- `URI_INVALID`
+- `UNKNOWN_ERROR`
+
+### Campos enviados en cada log
+
+Cada registro incluye:
+- `timestamp` (la API lo agrega automáticamente)
+- `module`
+- `event`
+- `level`
+- `message`
+- `android_version`
+- `device_model`
+- `app_version`
+- `battery_level`
+
+### Ejemplo con detalles adicionales
 
 ```java
-Retrofit retrofit = new Retrofit.Builder()
-    .baseUrl("https://tu-dominio.com/")
-    .addConverterFactory(GsonConverterFactory.create())
-    .build();
+Map<String, Object> details = new HashMap<>();
+details.put("photo_uri", uri);
+details.put("attempt", attempt);
 
-TelemetryApi api = retrofit.create(TelemetryApi.class);
-
-LogRequest log = new LogRequest();
-log.level = "INFO";
-log.module = "BackupService";
-log.event = "SERVICE_STARTED";
-log.message = "Servicio iniciado";
-log.details_json = new HashMap<>();
-log.device_model = "Redmi Note";
-log.android_version = "15";
-log.app_version = "1.0.0";
-log.battery_level = 85;
-log.screen_state = "OFF";
-log.service_state = "RUNNING";
-log.photo_uri = "";
-log.file_path = "";
-log.execution_time_ms = 0;
-
-api.sendLog(log).enqueue(new Callback<ApiResponse>() {
-    @Override
-    public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-        if (response.isSuccessful() && response.body() != null && response.body().success) {
-            Log.i("Telemetry", "Log enviado correctamente");
-        }
-    }
-
-    @Override
-    public void onFailure(Call<ApiResponse> call, Throwable t) {
-        Log.e("Telemetry", "Error enviando log", t);
-    }
-});
+TelemetryLogger.getInstance().logWarning(
+    TelemetryConstants.Module.FILE_COPIER,
+    TelemetryConstants.Event.PHOTO_COPY_FAILED,
+    "Fallo al copiar la foto",
+    details
+);
 ```
+
+### Nota
+
+Esta integración está diseñada para que puedas ver en tiempo real cada paso de PhotoBackup en el dashboard web de la API de telemetría.
 
 ## Despliegue en VPS Linux
 
