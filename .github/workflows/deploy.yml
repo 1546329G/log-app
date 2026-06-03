@@ -1,0 +1,28 @@
+name: Deploy a EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Desplegar en EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/log-app
+            git pull origin main
+            docker stop log-app || true
+            docker rm log-app || true
+            docker build -t log-app .
+            docker run -d \
+              --name log-app \
+              --restart always \
+              -p 80:3000 \
+              log-app

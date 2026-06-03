@@ -1,0 +1,95 @@
+body {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin: 0;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+header {
+  padding: 24px;
+  background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+  border-bottom: 1px solid #334155;
+}
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+header p {
+  margin: 8px 0 0;
+  color: #94a3b8;
+}
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+.filters label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+}
+.filters input,
+.filters select,
+.filters button {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+.filters button {
+  border-color: #2563eb;
+  background: #1d4ed8;
+  cursor: pointer;
+}
+.filters button:hover {
+  background: #2563eb;
+}
+.stats-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+.stat-card {
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 18px;
+}
+.stat-card strong {
+  font-size: 1.8rem;
+  display: block;
+}
+.stat-card span {
+  color: #94a3b8;
+}
+.stat-card.warning { border-color: #f97316; }
+.stat-card.success { border-color: #16a34a; }
+.stat-card.danger { border-color: #dc2626; }
+.table-container {
+  padding: 0 20px 24px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #0f172a;
+}
+th, td {
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid #1e293b;
+  font-size: 0.95rem;
+}
+th {
+  color: #94a3b8;
+  background: #111827;
+}
+tr:hover {
+  background: rgba(148, 163, 184, 0.06);
+}
+footer {
+  padding: 16px 20px 32px;
+  color: #94a3b8;
+}

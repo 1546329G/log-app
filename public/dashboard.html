@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard PhotoBackup Telemetry</title>
+  <link rel="stylesheet" href="/static/dashboard.css" />
+</head>
+<body>
+  <header>
+    <h1>PhotoBackup Telemetry</h1>
+    <p>Visualización en tiempo real de eventos y errores.</p>
+  </header>
+
+  <section class="filters">
+    <div>
+      <label>Nivel</label>
+      <select id="filterLevel">
+        <option value="">Todos</option>
+        <option value="INFO">INFO</option>
+        <option value="DEBUG">DEBUG</option>
+        <option value="WARN">WARN</option>
+        <option value="ERROR">ERROR</option>
+        <option value="FATAL">FATAL</option>
+      </select>
+    </div>
+    <div>
+      <label>Módulo</label>
+      <input id="filterModule" placeholder="BackupService" />
+    </div>
+    <div>
+      <label>Evento</label>
+      <input id="filterEvent" placeholder="SERVICE_STARTED" />
+    </div>
+    <div>
+      <label>Fecha inicio</label>
+      <input id="filterStart" type="date" />
+    </div>
+    <div>
+      <label>Fecha fin</label>
+      <input id="filterEnd" type="date" />
+    </div>
+    <div>
+      <label>Buscar</label>
+      <input id="searchText" placeholder="Mensaje, dispositivo, ruta" />
+    </div>
+    <div class="actions">
+      <button id="refreshButton">Actualizar</button>
+    </div>
+  </section>
+
+  <section class="stats-panel">
+    <div class="stat-card">
+      <strong id="totalLogs">0</strong>
+      <span>Total logs</span>
+    </div>
+    <div class="stat-card warning">
+      <strong id="totalErrors">0</strong>
+      <span>Errores</span>
+    </div>
+    <div class="stat-card">
+      <strong id="serviceRestarts">0</strong>
+      <span>Reinicios de servicio</span>
+    </div>
+    <div class="stat-card success">
+      <strong id="photosDetected">0</strong>
+      <span>Fotos detectadas</span>
+    </div>
+    <div class="stat-card success">
+      <strong id="photosCopied">0</strong>
+      <span>Copias exitosas</span>
+    </div>
+    <div class="stat-card danger">
+      <strong id="copyFailures">0</strong>
+      <span>Fallos de copia</span>
+    </div>
+  </section>
+
+  <section class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Nivel</th>
+          <th>Módulo</th>
+          <th>Evento</th>
+          <th>Mensaje</th>
+          <th>Dispositivo</th>
+          <th>Android</th>
+          <th>App</th>
+          <th>Batería</th>
+        </tr>
+      </thead>
+      <tbody id="logsBody"></tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>Actualización automática cada 5 segundos.</p>
+  </footer>
+
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>

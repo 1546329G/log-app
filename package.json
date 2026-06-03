@@ -1,0 +1,28 @@
+{
+  "name": "photobackup-telemetry-api",
+  "version": "1.0.0",
+  "description": "API de telemetría para PhotoBackup con dashboard integrado",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.10.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.0.1",
+    "mysql2": "^3.6.0",
+    "morgan": "^1.10.0",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
