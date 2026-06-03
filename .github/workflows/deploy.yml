@@ -5,11 +5,29 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Desplegar en EC2 via SSH
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t log-app .
+
+      - name: Save and compress image
+        run: docker save log-app | gzip > log-app.tar.gz
+
+      - name: Copy image to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: log-app.tar.gz
+          target: /home/ubuntu/log-app/
+
+      - name: Deploy en EC2
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -18,12 +36,13 @@ jobs:
           script: |
             cd /home/ubuntu/log-app
             git pull origin main
+            docker load < log-app.tar.gz
             docker stop log-app || true
             docker rm log-app || true
-            docker build -t log-app .
             docker run -d \
               --name log-app \
               --restart always \
               -p 80:3000 \
               -v /home/ubuntu/log-app/.env:/app/.env \
               log-app
+            rm -f log-app.tar.gz
