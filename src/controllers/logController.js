@@ -28,7 +28,7 @@ export async function createLog(req, res, next) {
 
 export async function createLogsBatch(req, res, next) {
   try {
-    const logs = Array.isArray(req.body) ? req.body : [req.body];
+    const logs = Array.isArray(req.body.logs) ? req.body.logs : (Array.isArray(req.body) ? req.body : [req.body]);
     if (logs.length === 0) {
       return res.status(400).json({ success: false, error: 'Se requiere al menos un log' });
     }
