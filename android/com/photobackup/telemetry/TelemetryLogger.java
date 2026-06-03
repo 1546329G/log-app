@@ -49,6 +49,13 @@ public class TelemetryLogger {
         }
     }
 
+    public static synchronized TelemetryLogger getInstance(Context context) {
+        if (instance == null) {
+            instance = new TelemetryLogger(context);
+        }
+        return instance;
+    }
+
     public static TelemetryLogger getInstance() {
         if (instance == null) {
             throw new IllegalStateException("TelemetryLogger must be initialized before use. Call TelemetryLogger.init(context).");

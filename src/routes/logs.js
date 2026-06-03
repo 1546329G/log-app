@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body, query } from 'express-validator';
-import { createLog, getLogs } from '../controllers/logController.js';
+import { createLog, createLogsBatch, getLogs } from '../controllers/logController.js';
 import { validateRequest } from '../middlewares/validation.js';
 
 const router = Router();
@@ -35,6 +35,7 @@ const logsQueryValidation = [
 ];
 
 router.post('/', logValidationRules, validateRequest, createLog);
+router.post('/batch', createLogsBatch);
 router.get('/', logsQueryValidation, validateRequest, getLogs);
 
 export default router;

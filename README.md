@@ -93,10 +93,20 @@ public class App extends Application {
 }
 ```
 
+También puedes obtener la instancia directamente con contexto cuando no hayas inicializado antes:
+
+```java
+TelemetryLogger.getInstance(this).logInfo(
+    TelemetryConstants.Module.BACKUP_SERVICE,
+    TelemetryConstants.Event.SERVICE_STARTED,
+    "Servicio BackupService iniciado correctamente"
+);
+```
+
 ### Uso básico
 
 ```java
-TelemetryLogger.getInstance().logInfo(
+TelemetryLogger.getInstance(this).logInfo(
     TelemetryConstants.Module.BACKUP_SERVICE,
     TelemetryConstants.Event.SERVICE_STARTED,
     "Servicio BackupService iniciado correctamente"

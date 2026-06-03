@@ -31,6 +31,36 @@ export async function insertLog(payload) {
   await pool.execute(query, values);
 }
 
+export async function insertLogsBatch(logs) {
+  const pool = getPool();
+  const query = `INSERT INTO logs (
+    level, module, event, message, details_json,
+    device_model, android_version, app_version,
+    battery_level, screen_state, service_state,
+    photo_uri, file_path, execution_time_ms
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  for (const log of logs) {
+    const values = [
+      log.level || 'INFO',
+      log.module || 'unknown',
+      log.event || 'UNKNOWN',
+      log.message || '',
+      log.details_json ? JSON.stringify(log.details_json) : '{}',
+      log.device_model || null,
+      log.android_version || null,
+      log.app_version || null,
+      log.battery_level ?? null,
+      log.screen_state || null,
+      log.service_state || null,
+      log.photo_uri || null,
+      log.file_path || null,
+      log.execution_time_ms ?? null,
+    ];
+    await pool.execute(query, values);
+  }
+}
+
 export async function queryLogs(filters, page, limit) {
   const pool = getPool();
   const offset = (page - 1) * limit;

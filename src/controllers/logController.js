@@ -1,4 +1,4 @@
-import { insertLog, queryLogs, countLogs } from '../services/logService.js';
+import { insertLog, insertLogsBatch, queryLogs, countLogs } from '../services/logService.js';
 
 export async function createLog(req, res, next) {
   try {
@@ -21,6 +21,22 @@ export async function createLog(req, res, next) {
 
     await insertLog(payload);
     return res.status(201).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function createLogsBatch(req, res, next) {
+  try {
+    const logs = Array.isArray(req.body) ? req.body : [req.body];
+    if (logs.length === 0) {
+      return res.status(400).json({ success: false, error: 'Se requiere al menos un log' });
+    }
+    if (logs.length > 100) {
+      return res.status(400).json({ success: false, error: 'Maximo 100 logs por batch' });
+    }
+    await insertLogsBatch(logs);
+    return res.status(201).json({ success: true, count: logs.length });
   } catch (error) {
     next(error);
   }
