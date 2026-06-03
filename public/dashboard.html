@@ -3,13 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard PhotoBackup Telemetry</title>
+  <title>PhotoBackup Telemetry</title>
   <link rel="stylesheet" href="/static/dashboard.css" />
 </head>
 <body>
   <header>
-    <h1>PhotoBackup Telemetry</h1>
-    <p>Visualización en tiempo real de eventos y errores.</p>
+    <div class="brand">
+      <div class="logo">P</div>
+      <div>
+        <h1>PhotoBackup Telemetry</h1>
+        <p>Monitoreo en tiempo real de respaldo de fotos</p>
+      </div>
+    </div>
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span>En vivo</span>
+    </div>
   </header>
 
   <section class="filters">
@@ -42,7 +51,7 @@
     </div>
     <div>
       <label>Buscar</label>
-      <input id="searchText" placeholder="Mensaje, dispositivo, ruta" />
+      <input id="searchText" placeholder="Mensaje, dispositivo..." />
     </div>
     <div class="actions">
       <button id="refreshButton">Actualizar</button>
@@ -50,17 +59,21 @@
   </section>
 
   <section class="stats-panel">
-    <div class="stat-card">
+    <div class="stat-card info">
       <strong id="totalLogs">0</strong>
       <span>Total logs</span>
     </div>
-    <div class="stat-card warning">
+    <div class="stat-card danger">
       <strong id="totalErrors">0</strong>
       <span>Errores</span>
     </div>
-    <div class="stat-card">
+    <div class="stat-card warning">
+      <strong id="totalWarnings">0</strong>
+      <span>Advertencias</span>
+    </div>
+    <div class="stat-card info">
       <strong id="serviceRestarts">0</strong>
-      <span>Reinicios de servicio</span>
+      <span>Reinicios servicio</span>
     </div>
     <div class="stat-card success">
       <strong id="photosDetected">0</strong>
@@ -75,10 +88,6 @@
       <span>Fallos de copia</span>
     </div>
     <div class="stat-card warning">
-      <strong id="totalWarnings">0</strong>
-      <span>Advertencias</span>
-    </div>
-    <div class="stat-card">
       <strong id="processFailures">0</strong>
       <span>Fallos de proceso</span>
     </div>
@@ -86,38 +95,43 @@
       <strong id="rescueRecoveries">0</strong>
       <span>Rescates exitosos</span>
     </div>
-    <div class="stat-card">
+    <div class="stat-card info">
       <strong id="rescueScans">0</strong>
       <span>Escaneos rescate</span>
     </div>
-    <div class="stat-card">
+    <div class="stat-card info">
       <strong id="bootEvents">0</strong>
-      <span>Inicios/boot</span>
+      <span>Inicios / Boot</span>
     </div>
   </section>
 
   <section class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Nivel</th>
-          <th>Módulo</th>
-          <th>Evento</th>
-          <th>Mensaje</th>
-          <th>Detalles</th>
-          <th>Dispositivo</th>
-          <th>Android</th>
-          <th>App</th>
-          <th>Batería</th>
-        </tr>
-      </thead>
-      <tbody id="logsBody"></tbody>
-    </table>
+    <div class="table-header">
+      <h2>Registro de eventos</h2>
+      <span id="logCount">0 registros</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Nivel</th>
+            <th>Módulo</th>
+            <th>Evento</th>
+            <th>Mensaje</th>
+            <th>Detalles</th>
+            <th>Dispositivo</th>
+            <th>Android</th>
+            <th>Batería</th>
+          </tr>
+        </thead>
+        <tbody id="logsBody"></tbody>
+      </table>
+    </div>
   </section>
 
   <footer>
-    <p>Actualización automática cada 5 segundos.</p>
+    <p>Actualización automática cada 5 segundos &middot; PhotoBackup Telemetry API</p>
   </footer>
 
   <script src="/static/dashboard.js"></script>

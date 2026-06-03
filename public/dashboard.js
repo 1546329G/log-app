@@ -2,6 +2,7 @@ const API_LOGS = '/api/logs';
 const API_STATS = '/api/stats';
 const refreshButton = document.getElementById('refreshButton');
 const logsBody = document.getElementById('logsBody');
+const logCount = document.getElementById('logCount');
 const totalLogs = document.getElementById('totalLogs');
 const totalErrors = document.getElementById('totalErrors');
 const totalWarnings = document.getElementById('totalWarnings');
@@ -27,7 +28,7 @@ function getFilters() {
   if (event) params.set('event', event);
   if (start) params.set('fecha_inicio', start);
   if (end) params.set('fecha_fin', end);
-  params.set('limit', '100');
+  params.set('limit', '200');
   return params;
 }
 
@@ -50,6 +51,35 @@ async function loadStats() {
   } catch (error) {
     console.error(error);
   }
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function levelBadge(level) {
+  const cls = 'level-' + level;
+  return `<span class="level-badge ${cls}">${level}</span>`;
+}
+
+function moduleTag(module) {
+  if (!module) return '';
+  return `<span class="module-tag">${escapeHtml(module)}</span>`;
+}
+
+function formatDetails(d) {
+  if (!d || typeof d !== 'object') return '';
+  const parts = [];
+  if (d.uri) parts.push('<strong>URI:</strong> ' + d.uri);
+  if (d.fileName) parts.push('<strong>Archivo:</strong> ' + d.fileName);
+  if (d.error) parts.push('<strong>Error:</strong> ' + d.error);
+  if (d.attempt) parts.push('<strong>Intento:</strong> ' + d.attempt);
+  if (d.enqueued) parts.push('<strong>Encoladas:</strong> ' + d.enqueued);
+  if (d.source) parts.push('<strong>Origen:</strong> ' + d.source);
+  if (d.size) parts.push('<strong>Tamaño:</strong> ' + d.size);
+  return parts.join('<br>');
 }
 
 async function loadLogs() {
@@ -76,39 +106,31 @@ async function loadLogs() {
       .map((log) => {
         let details = '';
         try {
-          const d = log.details_json;
-          if (d && typeof d === 'object') {
-            const parts = [];
-            if (d.uri) parts.push('uri: ' + d.uri);
-            if (d.fileName) parts.push('file: ' + d.fileName);
-            if (d.error) parts.push('error: ' + d.error);
-            if (d.attempt) parts.push('intento: ' + d.attempt);
-            if (d.enqueued) parts.push('encoladas: ' + d.enqueued);
-            if (d.source) parts.push('origen: ' + d.source);
-            if (d.size) parts.push('tam: ' + d.size);
-            if (parts.length) details = parts.join('<br>');
-          }
+          details = formatDetails(log.details_json);
         } catch (e) {}
         return `<tr>
-          <td>${new Date(log.created_at).toLocaleString()}</td>
-          <td>${log.level}</td>
-          <td>${log.module}</td>
-          <td>${log.event}</td>
-          <td>${escapeHtml(log.message)}</td>
-          <td style="font-size:0.85rem;max-width:250px;word-break:break-all">${details}</td>
-          <td>${escapeHtml(log.device_model || '')}</td>
-          <td>${escapeHtml(log.android_version || '')}</td>
-          <td>${escapeHtml(log.app_version || '')}</td>
-          <td>${log.battery_level ?? ''}%</td>
+          <td style="white-space:nowrap;font-size:0.78rem;color:var(--text-muted)">${formatDate(log.created_at)}</td>
+          <td>${levelBadge(log.level)}</td>
+          <td>${moduleTag(log.module)}</td>
+          <td><span class="event-cell">${escapeHtml(log.event)}</span></td>
+          <td style="max-width:200px">${escapeHtml(log.message)}</td>
+          <td class="details-cell">${details}</td>
+          <td style="font-size:0.78rem">${escapeHtml(log.device_model || '')}</td>
+          <td style="font-size:0.78rem;text-align:center">${escapeHtml(log.android_version || '')}</td>
+          <td style="text-align:center;font-weight:600;font-size:0.8rem">${log.battery_level ?? ''}<span style="color:var(--text-muted);font-weight:400">${log.battery_level != null ? '%' : ''}</span></td>
         </tr>`;
       })
       .join('');
+    if (logCount) {
+      logCount.textContent = logs.length + ' registros';
+    }
   } catch (error) {
     console.error(error);
   }
 }
 
 function escapeHtml(value) {
+  if (!value) return '';
   return value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
