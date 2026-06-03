@@ -145,5 +145,5 @@ function refresh() {
 }
 
 refreshButton.addEventListener('click', refresh);
-setInterval(refresh, 5000);
+setInterval(refresh, 1000);
 refresh();
